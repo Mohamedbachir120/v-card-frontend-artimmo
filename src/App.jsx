@@ -10,6 +10,9 @@ import { PublicCard } from "./pages/PublicCard";
 import { CardFormModal } from "./pages/CardFormModal";
 import { QRModal } from "./pages/QrModal";
 import { DeleteModal } from "./pages/DeleteModal";
+import { LeadsBoard } from "./pages/crm/LeadsBoard";
+import { CrmDashboardPage } from "./pages/crm/CrmDashboardPage";
+import { LeadCaptureForm } from "./pages/crm/LeadCaptureForm";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -33,6 +36,9 @@ export default function App() {
       const uuid = path.replace("/card/", ""); // ← was "/public/"
       setPublicUuid(uuid);
       setView("public");
+    } else if (path.startsWith("/contact")) {
+      // Public landing page that ad campaigns redirect to.
+      setView("lead-capture");
     } else {
       setView("dashboard");
     }
@@ -128,9 +134,13 @@ export default function App() {
   };
   useEffect(() => { injectCss(); }, []);
 
-  // 2. Public View
+  // 2. Public Views (no auth required)
   if (view === "public") {
     return <PublicCard uuid={publicUuid} onBack={() => setView("dashboard")} />;
+  }
+
+  if (view === "lead-capture") {
+    return <LeadCaptureForm />;
   }
 
   // 3. Auth View
@@ -176,16 +186,40 @@ export default function App() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button 
-            onClick={() => setView("stats")} 
+          <button
+            onClick={() => setView("dashboard")}
+            className="nav-link"
+            style={{ ...btn("nav", "sm") }}
+          >
+            <Icon name="card" size={14} color="#fff" />
+            Cards
+          </button>
+          <button
+            onClick={() => setView("crm-board")}
+            className="nav-link"
+            style={{ ...btn("nav", "sm") }}
+          >
+            <Icon name="kanban" size={14} color="#fff" />
+            CRM
+          </button>
+          <button
+            onClick={() => setView("crm-dashboard")}
+            className="nav-link"
+            style={{ ...btn("nav", "sm") }}
+          >
+            <Icon name="trendUp" size={14} color="#fff" />
+            Tableau de bord
+          </button>
+          <button
+            onClick={() => setView("stats")}
             className="nav-link"
             style={{ ...btn("nav", "sm") }}
           >
             <Icon name="barChart" size={14} color="#fff" />
             Analytics
           </button>
-          <button 
-            onClick={handleLogout} 
+          <button
+            onClick={handleLogout}
             className="nav-link"
             style={{ ...btn("nav", "sm") }}
           >
@@ -199,6 +233,10 @@ export default function App() {
       {view === "stats" && (
         <StatsPage onBack={() => setView("dashboard")} />
       )}
+
+      {/* ─── CRM PAGES ─── */}
+      {view === "crm-board" && <LeadsBoard toast={show} />}
+      {view === "crm-dashboard" && <CrmDashboardPage toast={show} />}
 
       {/* ─── DASHBOARD PAGE ─── */}
       {view === "dashboard" && (
