@@ -1,0 +1,319 @@
+import { useState, useEffect, useCallback } from "react";
+import { api } from "./services/api";
+import { GLOBAL_CSS, P, T, btn } from "./utils/theme";
+import { useToast, Toasts } from "./components/ui";
+import { Icon } from "./components/Icon";
+import { CardTile } from "./components/CardTile";
+import { AuthPage } from "./pages/AuthPage";
+import { StatsPage } from "./pages/StatsPage";
+import { PublicCard } from "./pages/PublicCard";
+import { CardFormModal } from "./pages/CardFormModal";
+import { QRModal } from "./pages/QrModal";
+import { DeleteModal } from "./pages/DeleteModal";
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [cards, setCards] = useState([]);
+  const [loadingCards, setLoadingCards] = useState(true);
+  
+  // View routing state
+  const [view, setView] = useState("dashboard"); // dashboard | stats | public
+  const [publicUuid, setPublicUuid] = useState(null);
+
+  // Modal states
+  const [editingCard, setEditingCard] = useState(null);
+  const [qrCard, setQrCard] = useState(null);
+  const [deletingCard, setDeletingCard] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const { toasts, show } = useToast();
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.startsWith("/card/")) {       // ← was "/public/"
+      const uuid = path.replace("/card/", ""); // ← was "/public/"
+      setPublicUuid(uuid);
+      setView("public");
+    } else {
+      setView("dashboard");
+    }
+  }, []);
+  // ─── Auth Bootstrapping ─────────────────────────────────
+  useEffect(() => {
+    const token = localStorage.getItem("vbc_token");
+    if (token) {
+      api("/api/auth/me")
+        .then(u => setUser(u))
+        .catch(() => localStorage.removeItem("vbc_token"));
+    }
+  }, []);
+
+  // ─── Fetch Cards ────────────────────────────────────────
+  const fetchCards = useCallback(async () => {
+    if (!user) return;
+    setLoadingCards(true);
+    try {
+      const data = await api("/api/cards");
+      setCards(data);
+    } catch (err) {
+      show(err.message, "error");
+    } finally {
+      setLoadingCards(false);
+    }
+  }, [user, show]);
+
+  useEffect(() => {
+    fetchCards();
+  }, [fetchCards]);
+
+  // ─── Handlers ───────────────────────────────────────────
+  const handleLogin = (u) => {
+    setUser(u);
+    setView("dashboard");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("vbc_token");
+    setUser(null);
+    setCards([]);
+    setView("dashboard");
+  };
+
+  const handleSavedCard = (savedCard) => {
+    setCards(prev => {
+      const exists = prev.find(c => c.id === savedCard.id);
+      return exists 
+        ? prev.map(c => c.id === savedCard.id ? savedCard : c)
+        : [savedCard, ...prev];
+    });
+  };
+
+  const handleDelete = async () => {
+    if (!deletingCard) return;
+    try {
+      await api(`/api/cards/${deletingCard.id}`, { method: "DELETE" });
+      setCards(prev => prev.filter(c => c.id !== deletingCard.id));
+      show("Card deleted successfully", "success");
+      setDeletingCard(null);
+    } catch (err) {
+      show(err.message, "error");
+    }
+  };
+
+  const handleToggle = async (card) => {
+    try {
+      const updated = await api(`/api/cards/${card.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ ...card, isActive: !card.isActive })
+      });
+      setCards(prev => prev.map(c => c.id === card.id ? updated : c));
+      show(`Card is now ${updated.isActive ? "Active" : "Hidden"}`, "success");
+    } catch (err) {
+      show(err.message, "error");
+    }
+  };
+
+  const handlePreview = (card) => {
+    setPublicUuid(card.uuid);
+    setView("public");
+    window.history.pushState({}, "", `/card/${card.uuid}`);
+  };
+
+  // ─── Render Gates ───────────────────────────────────────
+  
+  // 1. Inject Global CSS
+  const injectCss = () => {
+    const style = document.createElement("style");
+    style.innerHTML = GLOBAL_CSS;
+    document.head.appendChild(style);
+  };
+  useEffect(() => { injectCss(); }, []);
+
+  // 2. Public View
+  if (view === "public") {
+    return <PublicCard uuid={publicUuid} onBack={() => setView("dashboard")} />;
+  }
+
+  // 3. Auth View
+  if (!user) {
+    return (
+      <>
+        <AuthPage onLogin={handleLogin} />
+        <Toasts toasts={toasts} />
+      </>
+    );
+  }
+
+  // 4. Main Dashboard Layout
+  return (
+    <div style={{ minHeight: "100vh", background: P.bg }}>
+      {/* ─── HEADER ─── */}
+      <header style={{ 
+        background: P.navy, 
+        color: "#fff", 
+        padding: "14px 32px", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "space-between",
+        boxShadow: T.shadow.sm,
+        position: "sticky",
+        top: 0,
+        zIndex: 100
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ 
+            width: 36, height: 36, borderRadius: T.r.md, 
+            background: "rgba(255,255,255,0.15)", 
+            display: "flex", alignItems: "center", justifyContent: "center" 
+          }}>
+            <Icon name="card" size={18} color="#fff" />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.3px" }}>Artimmo</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>
+              Welcome back, {user.name?.split(" ")[0]}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button 
+            onClick={() => setView("stats")} 
+            className="nav-link"
+            style={{ ...btn("nav", "sm") }}
+          >
+            <Icon name="barChart" size={14} color="#fff" />
+            Analytics
+          </button>
+          <button 
+            onClick={handleLogout} 
+            className="nav-link"
+            style={{ ...btn("nav", "sm") }}
+          >
+            <Icon name="logOut" size={14} color="#fff" />
+            Logout
+          </button>
+        </div>
+      </header>
+
+      {/* ─── STATS PAGE ─── */}
+      {view === "stats" && (
+        <StatsPage onBack={() => setView("dashboard")} />
+      )}
+
+      {/* ─── DASHBOARD PAGE ─── */}
+      {view === "dashboard" && (
+        <main style={{ maxWidth: 1200, margin: "0 auto", padding: "36px 28px" }}>
+          
+          {/* Page Title & Add Button */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+            <div>
+              <h1 style={{ fontSize: 26, fontWeight: 800, color: P.text, letterSpacing: "-0.6px" }}>
+                Your Business Cards
+              </h1>
+              <p style={{ color: P.textMuted, fontSize: 14, marginTop: 4 }}>
+                Create, manage, and share your digital identity
+              </p>
+            </div>
+            <button 
+              onClick={() => { setEditingCard(null); setIsFormOpen(true); }} 
+              className="hoverable"
+              style={{ ...btn("primary", "md"), boxShadow: T.shadow.md }}
+            >
+              <Icon name="plus" size={16} color="#fff" />
+              New Card
+            </button>
+          </div>
+
+          {/* Cards Grid */}
+          {loadingCards ? (
+            <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
+              <div style={{ 
+                width: 28, height: 28, borderRadius: "50%", 
+                border: `2.5px solid ${P.border}`, 
+                borderTopColor: P.navy, 
+                animation: "spin 0.7s linear infinite" 
+              }} />
+            </div>
+          ) : cards.length === 0 ? (
+            <div style={{ 
+              background: P.bgCard, 
+              border: `2px dashed ${P.border}`, 
+              borderRadius: T.r.xl, 
+              padding: "60px 20px", 
+              textAlign: "center" 
+            }}>
+              <div style={{ 
+                width: 64, height: 64, borderRadius: T.r.lg, 
+                background: P.accentLt, 
+                display: "flex", alignItems: "center", justifyContent: "center", 
+                margin: "0 auto 16px" 
+              }}>
+                <Icon name="card" size={28} color={P.blue} />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: P.text, marginBottom: 6 }}>
+                No cards yet
+              </h3>
+              <p style={{ color: P.textMuted, fontSize: 14, marginBottom: 20 }}>
+                Create your first digital business card to start sharing.
+              </p>
+              <button 
+                onClick={() => { setEditingCard(null); setIsFormOpen(true); }} 
+                className="hoverable"
+                style={btn("primary", "md")}
+              >
+                <Icon name="plus" size={16} color="#fff" />
+                Create your first card
+              </button>
+            </div>
+          ) : (
+            <div style={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", 
+              gap: 20 
+            }}>
+              {cards.map(card => (
+                <CardTile 
+                  key={card.id} 
+                  card={card}
+                  onEdit={(c) => { setEditingCard(c); setIsFormOpen(true); }}
+                  onDelete={(c) => setDeletingCard(c)}
+                  onToggle={handleToggle}
+                  onQR={(c) => setQrCard(c)}
+                  onPreview={handlePreview}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      )}
+
+      {/* ─── MODALS ─── */}
+      {isFormOpen && (
+        <CardFormModal 
+          card={editingCard} 
+          onClose={() => setIsFormOpen(false)} 
+          onSaved={handleSavedCard}
+          toast={show}
+        />
+      )}
+
+      {qrCard && (
+        <QRModal 
+          card={qrCard} 
+          onClose={() => setQrCard(null)} 
+        />
+      )}
+
+      {deletingCard && (
+        <DeleteModal 
+          card={deletingCard} 
+          onCancel={() => setDeletingCard(null)} 
+          onConfirm={handleDelete} 
+        />
+      )}
+
+      {/* ─── TOASTS ─── */}
+      <Toasts toasts={toasts} />
+    </div>
+  );
+}
