@@ -1,0 +1,16 @@
+# This app reads its own URL in JS (/card/:uuid, /contact) instead of using
+# a router, so the server must serve index.html for any path that isn't an
+# actual file, and let the app take over from there.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Real files and folders (index.html, assets/, favicon.svg, icons.svg) are
+  # served as-is.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Everything else (e.g. /card/<uuid>, /contact) falls back to index.html.
+  RewriteRule ^ index.html [L]
+</IfModule>
