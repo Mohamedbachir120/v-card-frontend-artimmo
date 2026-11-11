@@ -13,6 +13,7 @@ import { DeleteModal } from "./pages/DeleteModal";
 import { LeadsBoard } from "./pages/crm/LeadsBoard";
 import { CrmDashboardPage } from "./pages/crm/CrmDashboardPage";
 import { LeadCaptureForm } from "./pages/crm/LeadCaptureForm";
+import { UsersPage } from "./pages/crm/UsersPage";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -159,6 +160,7 @@ export default function App() {
     { key: "crm-board",    icon: "kanban",   label: "CRM" },
     { key: "crm-dashboard",icon: "trendUp",  label: "Tableau de bord" },
     { key: "stats",        icon: "barChart", label: "Statistiques" },
+    ...(user.role === "admin" ? [{ key: "users", icon: "users", label: "Équipe" }] : []),
   ];
 
   return (
@@ -234,8 +236,9 @@ export default function App() {
       )}
 
       {/* ─── CRM PAGES ─── */}
-      {view === "crm-board" && <LeadsBoard toast={show} />}
+      {view === "crm-board" && <LeadsBoard toast={show} user={user} />}
       {view === "crm-dashboard" && <CrmDashboardPage toast={show} />}
+      {view === "users" && user.role === "admin" && <UsersPage toast={show} />}
 
       {/* ─── DASHBOARD PAGE ─── */}
       {view === "dashboard" && (

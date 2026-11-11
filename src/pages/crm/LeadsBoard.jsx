@@ -8,7 +8,7 @@ import { LeadCard } from "./LeadCard";
 import { LeadFormModal } from "./LeadFormModal";
 import { LeadDetailModal } from "./LeadDetailModal";
 
-export function LeadsBoard({ toast }) {
+export function LeadsBoard({ toast, user }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -98,6 +98,7 @@ export function LeadsBoard({ toast }) {
           onClose={() => setOpenLead(null)}
           onUpdated={(u) => { handleUpdated(u); setOpenLead(u); }}
           toast={toast}
+          currentUser={user}
         />
       )}
     </main>

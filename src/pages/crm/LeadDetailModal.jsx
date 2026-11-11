@@ -5,7 +5,7 @@ import { Overlay, ModalBox, CloseBtn, TextInput, AlertBox } from "../../componen
 import { P, T, btn } from "../../utils/theme";
 import { STATUSES, INTERACTION_TYPES, formatBudget, formatDateTime } from "./crmUtils";
 
-export function LeadDetailModal({ lead, onClose, onUpdated, toast }) {
+export function LeadDetailModal({ lead, onClose, onUpdated, toast, currentUser }) {
   const [current, setCurrent] = useState(lead);
   const [interactions, setInteractions] = useState([]);
   const [reminders, setReminders] = useState([]);
@@ -15,6 +15,8 @@ export function LeadDetailModal({ lead, onClose, onUpdated, toast }) {
   const [reminderDue, setReminderDue] = useState("");
   const [reminderNote, setReminderNote] = useState("");
   const [error, setError] = useState("");
+  const [team, setTeam] = useState([]);
+  const isAdmin = currentUser?.role === "admin";
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -33,6 +35,26 @@ export function LeadDetailModal({ lead, onClose, onUpdated, toast }) {
   }, [lead.id]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    api("/api/users").then(setTeam).catch(() => {});
+  }, [isAdmin]);
+
+  const assignTo = async (e) => {
+    const userId = e.target.value ? Number(e.target.value) : null;
+    if (!userId) return;
+    try {
+      const updated = await api(`/api/leads/${current.id}/assign`, {
+        method: "PATCH", body: JSON.stringify({ assignedTo: userId }),
+      });
+      setCurrent(updated);
+      onUpdated(updated);
+      toast("Prospect assigné", "success");
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  };
 
   const changeStatus = async (status) => {
     try {
@@ -106,6 +128,32 @@ export function LeadDetailModal({ lead, onClose, onUpdated, toast }) {
         {budget && (
           <div style={{ fontSize: 13.5, fontWeight: 600, color: P.textSub, marginBottom: 14 }}>{budget}</div>
         )}
+
+        {/* Source / campaign */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: current.source === "ads" ? P.blue : P.textMuted,
+            background: current.source === "ads" ? P.accentLt : P.bg,
+            border: `1px solid ${current.source === "ads" ? P.bluePale : P.border}`,
+            borderRadius: T.r.pill, padding: "3px 10px" }}>
+            {current.source === "ads" ? "Campagne publicitaire" : "Saisie manuelle"}
+          </span>
+          {current.campaign && (
+            <span style={{ fontSize: 12, color: P.textMuted }}>
+              Campagne : <strong style={{ color: P.textSub }}>{current.campaign}</strong>
+            </span>
+          )}
+          {isAdmin && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
+              <span style={{ fontSize: 12, color: P.textMuted }}>Assigné à</span>
+              <select value={current.assignedTo || ""} onChange={assignTo} style={{
+                padding: "5px 8px", borderRadius: T.r.sm, border: `1px solid ${P.border}`,
+                fontSize: 12.5, fontFamily: "inherit", background: "#fff" }}>
+                <option value="">— Non assigné —</option>
+                {team.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+              </select>
+            </div>
+          )}
+        </div>
 
         {/* Pipeline stage pills */}
         <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>

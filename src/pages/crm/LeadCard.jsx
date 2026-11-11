@@ -24,6 +24,13 @@ export function LeadCard({ lead, onOpen }) {
         )}
       </div>
 
+      {lead.campaign && (
+        <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: P.blue, fontSize: 11.5, fontWeight: 600 }}>
+          <Icon name="trendUp" size={11} color={P.blue} />
+          {lead.campaign}
+        </div>
+      )}
+
       {lead.location && (
         <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 6, color: P.textMuted, fontSize: 12.5 }}>
           <Icon name="mapPin" size={12} color={P.textMuted} />
