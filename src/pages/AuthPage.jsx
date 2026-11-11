@@ -39,29 +39,29 @@ export function AuthPage({ onLogin }) {
           </div>
           <div>
             <div style={{ fontWeight:700,fontSize:17,color:P.navy,letterSpacing:"-0.4px",lineHeight:1.2 }}>Artimmo</div>
-            <div style={{ fontSize:11,color:P.textMuted,letterSpacing:"0.3px" }}>DIGITAL BUSINESS CARDS</div>
+            <div style={{ fontSize:11,color:P.textMuted,letterSpacing:"0.3px" }}>CARTES DE VISITE NUMÉRIQUES</div>
           </div>
         </div>
         <h1 style={{ fontSize:24,fontWeight:700,color:P.text,letterSpacing:"-0.5px",marginBottom:4 }}>
-          {mode==="login" ? "Welcome back" : "Create your account"}
+          {mode==="login" ? "Bon retour" : "Créez votre compte"}
         </h1>
         <p style={{ color:P.textMuted,fontSize:14,marginBottom:28 }}>
-          {mode==="login" ? "Sign in to manage your cards" : "Start sharing your contact in style"}
+          {mode==="login" ? "Connectez-vous pour gérer vos cartes" : "Commencez à partager vos coordonnées avec style"}
         </p>
         {error && <AlertBox>{error}</AlertBox>}
         <form onSubmit={submit}>
           {mode==="register" && (
             <div style={{ marginBottom:16 }}>
-              <FieldLabel>Full name</FieldLabel>
-              <TextInput value={form.name} onChange={set("name")} placeholder="Your full name" required/>
+              <FieldLabel>Nom complet</FieldLabel>
+              <TextInput value={form.name} onChange={set("name")} placeholder="Votre nom complet" required/>
             </div>
           )}
           <div style={{ marginBottom:16 }}>
-            <FieldLabel>Email address</FieldLabel>
-            <TextInput type="email" value={form.email} onChange={set("email")} placeholder="you@example.com" required/>
+            <FieldLabel>Adresse e-mail</FieldLabel>
+            <TextInput type="email" value={form.email} onChange={set("email")} placeholder="vous@exemple.com" required/>
           </div>
           <div style={{ marginBottom:24 }}>
-            <FieldLabel>Password</FieldLabel>
+            <FieldLabel>Mot de passe</FieldLabel>
             <div style={{ position:"relative" }}>
               <TextInput type={showPass?"text":"password"} value={form.password} onChange={set("password")}
                 placeholder="••••••••" required style={{ paddingRight:40 }}/>
@@ -74,20 +74,20 @@ export function AuthPage({ onLogin }) {
           </div>
           <button type="submit" className="hoverable" disabled={loading}
             style={{ ...btn("primary","lg"), width:"100%", boxShadow:"0 4px 16px rgba(29,53,87,0.25)", fontWeight:600 }}>
-            {loading ? "Please wait…" : mode==="login" ? "Sign in" : "Create account"}
+            {loading ? "Veuillez patienter…" : mode==="login" ? "Se connecter" : "Créer le compte"}
           </button>
         </form>
         <div style={{ display:"flex", alignItems:"center", gap:12, margin:"22px 0 0" }}>
           <div style={{ flex:1,height:1,background:P.border }}/>
-          <span style={{ fontSize:12,color:P.textFaint }}>or</span>
+          <span style={{ fontSize:12,color:P.textFaint }}>ou</span>
           <div style={{ flex:1,height:1,background:P.border }}/>
         </div>
         <div style={{ textAlign:"center", marginTop:18, fontSize:14, color:P.textMuted }}>
-          {mode==="login" ? "No account yet? " : "Already have an account? "}
+          {mode==="login" ? "Pas encore de compte ? " : "Déjà un compte ? "}
           <button onClick={() => { setMode(mode==="login"?"register":"login"); setError(""); }}
             style={{ background:"none",border:"none",color:P.navy,fontWeight:600,cursor:"pointer",
               fontSize:14,padding:0,textDecoration:"underline",textUnderlineOffset:2 }}>
-            {mode==="login" ? "Sign up" : "Sign in"}
+            {mode==="login" ? "Créer un compte" : "Se connecter"}
           </button>
         </div>
       </div>

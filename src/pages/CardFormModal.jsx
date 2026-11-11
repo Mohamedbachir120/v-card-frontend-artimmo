@@ -21,19 +21,19 @@ export function CardFormModal({ card, onClose, onSaved, toast }) {
     try {
       const saved = await api(isEdit ? `/api/cards/${card.id}` : "/api/cards",
         { method: isEdit ? "PUT" : "POST", body: JSON.stringify(form) });
-      onSaved(saved); toast(isEdit ? "Card updated" : "Card created", "success"); onClose();
+      onSaved(saved); toast(isEdit ? "Carte mise à jour" : "Carte créée", "success"); onClose();
     } catch(err) { setError(err.message); }
     finally { setLoading(false); }
   };
 
   const fields = [
-    { key:"name",     label:"Display name *",  placeholder:"Your full name",      required:true, full:true },
-    { key:"role",     label:"Job title",        placeholder:"Software Engineer" },
-    { key:"company",  label:"Company",          placeholder:"Acme Corp" },
-    { key:"email",    label:"Email",            placeholder:"you@company.com" },
-    { key:"phone",    label:"Phone",            placeholder:"+213 555 000 000" },
-    { key:"website",  label:"Website",          placeholder:"https://yoursite.com" },
-    { key:"location", label:"Location",         placeholder:"Algiers, Algeria" },
+    { key:"name",     label:"Nom affiché *",    placeholder:"Votre nom complet",   required:true, full:true },
+    { key:"role",     label:"Poste",            placeholder:"Ingénieur logiciel" },
+    { key:"company",  label:"Entreprise",       placeholder:"Acme Corp" },
+    { key:"email",    label:"E-mail",           placeholder:"vous@entreprise.com" },
+    { key:"phone",    label:"Téléphone",        placeholder:"+213 555 000 000" },
+    { key:"website",  label:"Site web",         placeholder:"https://votresite.com" },
+    { key:"location", label:"Localisation",     placeholder:"Alger, Algérie" },
   ];
 
   return (
@@ -42,10 +42,10 @@ export function CardFormModal({ card, onClose, onSaved, toast }) {
         <div style={{ display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:28 }}>
           <div>
             <h2 style={{ fontSize:20,fontWeight:700,color:P.text,letterSpacing:"-0.4px" }}>
-              {isEdit ? "Edit card" : "New business card"}
+              {isEdit ? "Modifier la carte" : "Nouvelle carte de visite"}
             </h2>
             <p style={{ fontSize:13,color:P.textMuted,marginTop:3 }}>
-              {isEdit ? "Update your card details" : "Fill in your contact information"}
+              {isEdit ? "Mettez à jour les informations de votre carte" : "Renseignez vos coordonnées"}
             </p>
           </div>
           <CloseBtn onClick={onClose}/>
@@ -53,7 +53,7 @@ export function CardFormModal({ card, onClose, onSaved, toast }) {
         {error && <AlertBox>{error}</AlertBox>}
         <form onSubmit={submit}>
           {[
-            { label:"Contact info", keys:["name","role","company","email","phone","website","location"] },
+            { label:"Coordonnées", keys:["name","role","company","email","phone","website","location"] },
           ].map(section => (
             <div key={section.label} style={{ marginBottom:22 }}>
               <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:16 }}>
@@ -76,7 +76,7 @@ export function CardFormModal({ card, onClose, onSaved, toast }) {
           <div style={{ marginBottom:22 }}>
             <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:16 }}>
               <span style={{ fontSize:11,fontWeight:700,color:P.blue,textTransform:"uppercase",letterSpacing:"0.7px" }}>
-                Appearance
+                Apparence
               </span>
               <div style={{ flex:1,height:1,background:P.border }}/>
             </div>
@@ -90,14 +90,14 @@ export function CardFormModal({ card, onClose, onSaved, toast }) {
                 <Icon name="card" size={16} color={form.accent}/>
               </div>
               <span style={{ color:"#fff",fontWeight:600,fontSize:14,letterSpacing:"-0.2px" }}>
-                {form.name || "Preview"}
+                {form.name || "Aperçu"}
               </span>
               <span style={{ fontSize:12,color:"rgba(255,255,255,0.6)",marginLeft:2 }}>
                 {form.role || ""}
               </span>
             </div>
             <div style={{ display:"flex",gap:14 }}>
-              {[{key:"accent",label:"Header color"},{key:"accentLight",label:"Icon tint"}].map(({ key,label }) => (
+              {[{key:"accent",label:"Couleur d'en-tête"},{key:"accentLight",label:"Teinte des icônes"}].map(({ key,label }) => (
                 <div key={key} style={{ flex:1 }}>
                   <FieldLabel>{label}</FieldLabel>
                   <div style={{ display:"flex",alignItems:"center",gap:10,padding:"7px 12px",
@@ -117,9 +117,9 @@ export function CardFormModal({ card, onClose, onSaved, toast }) {
             padding:"13px 16px",background:P.bg,borderRadius:T.r.md,marginBottom:28,cursor:"pointer" }}
             onClick={() => setForm(f => ({ ...f, isActive:!f.isActive }))}>
             <div>
-              <div style={{ fontSize:14,fontWeight:500,color:P.text }}>Card visibility</div>
+              <div style={{ fontSize:14,fontWeight:500,color:P.text }}>Visibilité de la carte</div>
               <div style={{ fontSize:12,color:P.textMuted,marginTop:2 }}>
-                {form.isActive ? "Public — anyone with the link can view" : "Hidden from the public"}
+                {form.isActive ? "Publique — visible par toute personne ayant le lien" : "Masquée au public"}
               </div>
             </div>
             <div style={{ width:44,height:24,borderRadius:T.r.pill,
@@ -132,10 +132,10 @@ export function CardFormModal({ card, onClose, onSaved, toast }) {
           </div>
 
           <div style={{ display:"flex",gap:10 }}>
-            <button type="button" onClick={onClose} className="hoverable" style={{ ...btn("ghost"),flex:1 }}>Cancel</button>
+            <button type="button" onClick={onClose} className="hoverable" style={{ ...btn("ghost"),flex:1 }}>Annuler</button>
             <button type="submit" className="hoverable" disabled={loading}
               style={{ ...btn("primary"),flex:2,boxShadow:"0 4px 14px rgba(29,53,87,0.2)" }}>
-              {loading ? "Saving…" : isEdit ? "Save changes" : "Create card"}
+              {loading ? "Enregistrement…" : isEdit ? "Enregistrer" : "Créer la carte"}
             </button>
           </div>
         </form>

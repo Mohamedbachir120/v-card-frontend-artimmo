@@ -71,7 +71,7 @@ export function StatusBadge({ active }) {
       border: `1px solid ${active ? "#a6f0c4" : "#fac0c2"}` }}>
       <span style={{ width:5, height:5, borderRadius:"50%",
         background: active ? P.success : P.danger, flexShrink:0 }}/>
-      {active ? "Active" : "Hidden"}
+      {active ? "Active" : "Masquée"}
     </span>
   );
 }

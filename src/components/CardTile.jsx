@@ -56,7 +56,7 @@ export function CardTile({ card, onEdit, onDelete, onToggle, onQR, onPreview }) 
       <div style={{ padding:"4px 0",minHeight:contactRows.length===0?40:undefined }}>
         {contactRows.length === 0 ? (
           <div style={{ padding:"12px 18px",fontSize:12,color:P.textFaint,fontStyle:"italic" }}>
-            No contact info added yet
+            Aucune coordonnée ajoutée pour l'instant
           </div>
         ) : contactRows.map((r, i) => (
           <div key={i} style={{ display:"flex",alignItems:"center",gap:12,padding:"9px 18px",
@@ -77,20 +77,20 @@ export function CardTile({ card, onEdit, onDelete, onToggle, onQR, onPreview }) 
 
         <button onClick={() => onQR(card)} className="hoverable"
           style={{ ...btn("soft","sm"),flex:1 }}>
-          <Icon name="qr" size={13} color={P.blue}/>QR code
+          <Icon name="qr" size={13} color={P.blue}/>Code QR
         </button>
         <button onClick={() => onPreview(card)} className="hoverable"
           style={{ ...btn("soft","sm"),flex:1 }}>
-          <Icon name="eye" size={13} color={P.blue}/>Preview
+          <Icon name="eye" size={13} color={P.blue}/>Aperçu
         </button>
 
         <div style={{ width:1,height:20,background:P.border,flexShrink:0 }}/>
 
         {[
           { icon: card.isActive?"eyeOff":"eye", action:()=>onToggle(card),
-            title: card.isActive?"Hide card":"Make visible", danger:false },
-          { icon:"edit",  action:()=>onEdit(card),   title:"Edit card",   danger:false },
-          { icon:"trash", action:()=>onDelete(card), title:"Delete card", danger:true  },
+            title: card.isActive?"Masquer la carte":"Rendre visible", danger:false },
+          { icon:"edit",  action:()=>onEdit(card),   title:"Modifier la carte",   danger:false },
+          { icon:"trash", action:()=>onDelete(card), title:"Supprimer la carte", danger:true  },
         ].map(({ icon,action,title,danger }) => (
           <button key={icon} onClick={action} title={title} className="icon-btn"
             style={{ width:30,height:30,borderRadius:7,background:"transparent",

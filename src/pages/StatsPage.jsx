@@ -15,7 +15,7 @@ function dowHeatmap(viewsLast30Days) {
   return by;
 }
 
-const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_LABELS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
 // ── sub-components ───────────────────────────────────────────────────
 
@@ -43,8 +43,8 @@ function BarChart({ data }) {
             <div key={d.date} style={{ flex: 1, display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "flex-end", height: "100%", cursor: "pointer" }}
               onMouseEnter={e => {
-                const dt = new Date(d.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                setTooltip({ x: e.clientX, y: e.clientY, label: `${isToday ? "Today" : dt} · ${d.count} view${d.count !== 1 ? "s" : ""}` });
+                const dt = new Date(d.date + "T00:00:00").toLocaleDateString("fr-FR", { month: "short", day: "numeric" });
+                setTooltip({ x: e.clientX, y: e.clientY, label: `${isToday ? "Aujourd'hui" : dt} · ${d.count} vue${d.count !== 1 ? "s" : ""}` });
               }}
               onMouseMove={e => setTooltip(t => t ? { ...t, x: e.clientX, y: e.clientY } : null)}
               onMouseLeave={() => setTooltip(null)}>
@@ -65,11 +65,11 @@ function BarChart({ data }) {
         {data.map((d, i) => {
           const isToday = i === data.length - 1;
           const showLabel = i % 5 === 0 || isToday;
-          const dt = new Date(d.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          const dt = new Date(d.date + "T00:00:00").toLocaleDateString("fr-FR", { month: "short", day: "numeric" });
           return (
             <div key={d.date} style={{ flex: 1, textAlign: "center", fontSize: 9,
               color: isToday ? P.navy : P.textMuted, fontWeight: isToday ? 700 : 400 }}>
-              {showLabel ? (isToday ? "Today" : dt) : ""}
+              {showLabel ? (isToday ? "Aujourd'hui" : dt) : ""}
             </div>
           );
         })}
@@ -106,7 +106,7 @@ function CardBreakdown({ cards, total }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: P.text,
                 whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.name}</div>
-              <div style={{ fontSize: 11, color: P.textMuted }}>{c.count} view{c.count !== 1 ? "s" : ""}</div>
+              <div style={{ fontSize: 11, color: P.textMuted }}>{c.count} vue{c.count !== 1 ? "s" : ""}</div>
               <div style={{ marginTop: 5, height: 5, background: "#f1f5f9", borderRadius: 99 }}>
                 <div style={{ height: "100%", width: `${pct}%`, borderRadius: 99,
                   background: colors[i % colors.length], transition: "width 0.6s ease" }}/>
@@ -167,14 +167,14 @@ export function StatsPage({ onBack }) {
   const activeDays = counts.filter(c => c > 0).length;
   const peakDate   = stats?.viewsLast30Days.find(d => d.count === peak)?.date ?? "";
   const peakLabel  = peakDate
-    ? new Date(peakDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    ? new Date(peakDate + "T00:00:00").toLocaleDateString("fr-FR", { month: "short", day: "numeric" })
     : "—";
 
   const statItems = stats ? [
-    { num: stats.totalViews,          label: "Total views",   delta: "+12% vs last month", up: true,  color: P.navy,    icon: "eye"      },
-    { num: stats.viewsToday,          label: "Today",         delta: "so far today",        up: null,  color: P.blue,    icon: "trendUp"  },
-    { num: stats.viewsThisMonth,      label: "This month",    delta: "rolling 30 days",     up: true,  color: "#6366f1", icon: "calendar" },
-    { num: stats.viewsPerCard.length, label: "Active cards",  delta: "all cards live",      up: null,  color: P.success, icon: "card"     },
+    { num: stats.totalViews,          label: "Vues totales",     delta: "+12% vs mois dernier", up: true,  color: P.navy,    icon: "eye"      },
+    { num: stats.viewsToday,          label: "Aujourd'hui",      delta: "jusqu'à présent",       up: null,  color: P.blue,    icon: "trendUp"  },
+    { num: stats.viewsThisMonth,      label: "Ce mois-ci",       delta: "sur les 30 derniers jours", up: true, color: "#6366f1", icon: "calendar" },
+    { num: stats.viewsPerCard.length, label: "Cartes actives",   delta: "toutes les cartes actives", up: null, color: P.success, icon: "card"     },
   ] : [];
 
   const sectionCard = (children, extraStyle = {}) => (
@@ -200,12 +200,12 @@ export function StatsPage({ onBack }) {
           <Icon name="arrowLeft" size={15}/>
         </button>
         <div>
-          <h1 style={{ fontSize: 25, fontWeight: 800, color: P.text, letterSpacing: "-0.6px" }}>Analytics</h1>
-          <p style={{ color: P.textMuted, fontSize: 13, marginTop: 2 }}>Card performance across your collection</p>
+          <h1 style={{ fontSize: 25, fontWeight: 800, color: P.text, letterSpacing: "-0.6px" }}>Statistiques</h1>
+          <p style={{ color: P.textMuted, fontSize: 13, marginTop: 2 }}>Performance de vos cartes</p>
         </div>
         <div style={{ marginLeft: "auto", fontSize: 12, color: P.textMuted,
           background: "#f1f5f9", padding: "5px 10px", borderRadius: 6, border: `1px solid ${P.border}` }}>
-          Last 30 days
+          30 derniers jours
         </div>
       </div>
 
@@ -245,7 +245,7 @@ export function StatsPage({ onBack }) {
 
         {/* ── 30-day bar chart (full width) ── */}
         {sectionCard(<>
-          {sectionHead("Daily views — last 30 days", "Each bar represents one day's view count")}
+          {sectionHead("Vues quotidiennes — 30 derniers jours", "Chaque barre représente le nombre de vues d'un jour")}
           <BarChart data={stats.viewsLast30Days}/>
         </>, { marginBottom: 16 })}
 
@@ -253,23 +253,23 @@ export function StatsPage({ onBack }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
 
           {sectionCard(<>
-            {sectionHead("Views per card", "How each card is performing")}
+            {sectionHead("Vues par carte", "Performance de chaque carte")}
             <CardBreakdown cards={stats.viewsPerCard} total={stats.totalViews}/>
           </>)}
 
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
             {sectionCard(<>
-              {sectionHead("Performance snapshot", "Based on the last 30 days")}
+              {sectionHead("Aperçu des performances", "Basé sur les 30 derniers jours")}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-                <MiniStat num={peak}       label={`Peak · ${peakLabel}`}/>
-                <MiniStat num={avg}        label="Daily average"/>
-                <MiniStat num={activeDays} label="Active days"/>
+                <MiniStat num={peak}       label={`Pic · ${peakLabel}`}/>
+                <MiniStat num={avg}        label="Moyenne quotidienne"/>
+                <MiniStat num={activeDays} label="Jours actifs"/>
               </div>
             </>)}
 
             {sectionCard(<>
-              {sectionHead("Activity pattern", "View density by day of week")}
+              {sectionHead("Schéma d'activité", "Densité des vues par jour de la semaine")}
               <DowHeatmap viewsLast30Days={stats.viewsLast30Days}/>
             </>)}
 

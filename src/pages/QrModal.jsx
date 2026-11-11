@@ -31,7 +31,7 @@ export function QRModal({ card, onClose }) {
             </div>
             <div>
               <div style={{ fontSize:15,fontWeight:700,color:P.text,letterSpacing:"-0.2px" }}>{card.name}</div>
-              <div style={{ fontSize:12,color:P.textMuted }}>Share your card</div>
+              <div style={{ fontSize:12,color:P.textMuted }}>Partagez votre carte</div>
             </div>
           </div>
           <CloseBtn onClick={onClose}/>
@@ -48,12 +48,12 @@ export function QRModal({ card, onClose }) {
                 justifyContent:"center",flexDirection:"column",gap:10,color:P.textMuted,fontSize:13 }}>
                 <div style={{ width:22,height:22,borderRadius:"50%",border:`2.5px solid ${P.border}`,
                   borderTopColor:P.navy,animation:"spin 0.7s linear infinite" }}/>
-                Generating…
+                Génération…
               </div>
             )}
           </div>
           <div style={{ fontSize:12,color:P.textMuted,textAlign:"center",lineHeight:1.5 }}>
-            Scan with any camera app to open this card
+            Scannez avec l'appareil photo pour ouvrir cette carte
           </div>
         </div>
 
@@ -68,7 +68,7 @@ export function QRModal({ card, onClose }) {
           style={{ ...btn(copied?"success":"primary","md"), width:"100%",
             boxShadow: copied ? "0 4px 12px rgba(18,161,80,0.25)" : "0 4px 12px rgba(29,53,87,0.2)" }}>
           <Icon name={copied?"check":"copy"} size={15} color="#fff"/>
-          {copied ? "Link copied!" : "Copy link"}
+          {copied ? "Lien copié !" : "Copier le lien"}
         </button>
       </ModalBox>
     </Overlay>

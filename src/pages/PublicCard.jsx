@@ -242,7 +242,7 @@ export function PublicCard({ uuid }) {
         // Trigger entrance animation shortly after card loads
         setTimeout(() => setVisible(true), 50);
       })
-      .catch(() => setError("Card not found or inactive"));
+      .catch(() => setError("Carte introuvable ou inactive"));
   }, [uuid]);
 
   if (error) return (
@@ -263,7 +263,7 @@ export function PublicCard({ uuid }) {
       <div style={{ minHeight: "100vh", background: "#f7f8fa", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
           <div style={{ width: 28, height: 28, borderRadius: "50%", border: `2.5px solid ${P.border}`, borderTopColor: P.navy, animation: "spin 0.7s linear infinite" }} />
-          <span style={{ color: P.textMuted, fontSize: 14 }}>Loading card…</span>
+          <span style={{ color: P.textMuted, fontSize: 14 }}>Chargement de la carte…</span>
         </div>
       </div>
     </>

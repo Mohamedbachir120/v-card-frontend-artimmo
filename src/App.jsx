@@ -98,7 +98,7 @@ export default function App() {
     try {
       await api(`/api/cards/${deletingCard.id}`, { method: "DELETE" });
       setCards(prev => prev.filter(c => c.id !== deletingCard.id));
-      show("Card deleted successfully", "success");
+      show("Carte supprimée avec succès", "success");
       setDeletingCard(null);
     } catch (err) {
       show(err.message, "error");
@@ -112,7 +112,7 @@ export default function App() {
         body: JSON.stringify({ ...card, isActive: !card.isActive })
       });
       setCards(prev => prev.map(c => c.id === card.id ? updated : c));
-      show(`Card is now ${updated.isActive ? "Active" : "Hidden"}`, "success");
+      show(`Carte désormais ${updated.isActive ? "active" : "masquée"}`, "success");
     } catch (err) {
       show(err.message, "error");
     }
@@ -154,80 +154,79 @@ export default function App() {
   }
 
   // 4. Main Dashboard Layout
+  const navItems = [
+    { key: "dashboard",    icon: "card",     label: "Cartes" },
+    { key: "crm-board",    icon: "kanban",   label: "CRM" },
+    { key: "crm-dashboard",icon: "trendUp",  label: "Tableau de bord" },
+    { key: "stats",        icon: "barChart", label: "Statistiques" },
+  ];
+
   return (
-    <div style={{ minHeight: "100vh", background: P.bg }}>
-      {/* ─── HEADER ─── */}
-      <header style={{ 
-        background: P.navy, 
-        color: "#fff", 
-        padding: "14px 32px", 
-        display: "flex", 
-        alignItems: "center", 
-        justifyContent: "space-between",
-        boxShadow: T.shadow.sm,
+    <div style={{ minHeight: "100vh", background: P.bg, display: "flex" }}>
+      {/* ─── SIDEBAR ─── */}
+      <aside style={{
+        width: 230,
+        flexShrink: 0,
+        background: P.navy,
+        color: "#fff",
+        display: "flex",
+        flexDirection: "column",
         position: "sticky",
         top: 0,
-        zIndex: 100
+        height: "100vh",
+        boxShadow: T.shadow.sm,
+        zIndex: 100,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ 
-            width: 36, height: 36, borderRadius: T.r.md, 
-            background: "rgba(255,255,255,0.15)", 
-            display: "flex", alignItems: "center", justifyContent: "center" 
+        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "22px 20px" }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: T.r.md,
+            background: "rgba(255,255,255,0.15)",
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
           }}>
             <Icon name="card" size={18} color="#fff" />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.3px" }}>Artimmo</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>
-              Welcome back, {user.name?.split(" ")[0]}
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              Bonjour, {user.name?.split(" ")[0]}
             </div>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button
-            onClick={() => setView("dashboard")}
-            className="nav-link"
-            style={{ ...btn("nav", "sm") }}
-          >
-            <Icon name="card" size={14} color="#fff" />
-            Cards
-          </button>
-          <button
-            onClick={() => setView("crm-board")}
-            className="nav-link"
-            style={{ ...btn("nav", "sm") }}
-          >
-            <Icon name="kanban" size={14} color="#fff" />
-            CRM
-          </button>
-          <button
-            onClick={() => setView("crm-dashboard")}
-            className="nav-link"
-            style={{ ...btn("nav", "sm") }}
-          >
-            <Icon name="trendUp" size={14} color="#fff" />
-            Tableau de bord
-          </button>
-          <button
-            onClick={() => setView("stats")}
-            className="nav-link"
-            style={{ ...btn("nav", "sm") }}
-          >
-            <Icon name="barChart" size={14} color="#fff" />
-            Analytics
-          </button>
+        <nav style={{ display: "flex", flexDirection: "column", gap: 4, padding: "8px 14px", flex: 1 }}>
+          {navItems.map(item => (
+            <button
+              key={item.key}
+              onClick={() => setView(item.key)}
+              className="nav-link"
+              style={{
+                ...btn(view === item.key ? "nav" : "ghost", "sm"),
+                width: "100%", justifyContent: "flex-start",
+                background: view === item.key ? "rgba(255,255,255,0.14)" : "transparent",
+                border: "1px solid transparent",
+                color: "#fff",
+              }}
+            >
+              <Icon name={item.icon} size={15} color="#fff" />
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div style={{ padding: "14px", borderTop: "1px solid rgba(255,255,255,0.12)" }}>
           <button
             onClick={handleLogout}
             className="nav-link"
-            style={{ ...btn("nav", "sm") }}
+            style={{ ...btn("nav", "sm"), width: "100%", justifyContent: "flex-start" }}
           >
             <Icon name="logOut" size={14} color="#fff" />
-            Logout
+            Déconnexion
           </button>
         </div>
-      </header>
+      </aside>
+
+      {/* ─── CONTENT ─── */}
+      <div style={{ flex: 1, minWidth: 0 }}>
 
       {/* ─── STATS PAGE ─── */}
       {view === "stats" && (
@@ -241,77 +240,77 @@ export default function App() {
       {/* ─── DASHBOARD PAGE ─── */}
       {view === "dashboard" && (
         <main style={{ maxWidth: 1200, margin: "0 auto", padding: "36px 28px" }}>
-          
+
           {/* Page Title & Add Button */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
             <div>
               <h1 style={{ fontSize: 26, fontWeight: 800, color: P.text, letterSpacing: "-0.6px" }}>
-                Your Business Cards
+                Vos cartes de visite
               </h1>
               <p style={{ color: P.textMuted, fontSize: 14, marginTop: 4 }}>
-                Create, manage, and share your digital identity
+                Créez, gérez et partagez votre identité numérique
               </p>
             </div>
-            <button 
-              onClick={() => { setEditingCard(null); setIsFormOpen(true); }} 
+            <button
+              onClick={() => { setEditingCard(null); setIsFormOpen(true); }}
               className="hoverable"
               style={{ ...btn("primary", "md"), boxShadow: T.shadow.md }}
             >
               <Icon name="plus" size={16} color="#fff" />
-              New Card
+              Nouvelle carte
             </button>
           </div>
 
           {/* Cards Grid */}
           {loadingCards ? (
             <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
-              <div style={{ 
-                width: 28, height: 28, borderRadius: "50%", 
-                border: `2.5px solid ${P.border}`, 
-                borderTopColor: P.navy, 
-                animation: "spin 0.7s linear infinite" 
+              <div style={{
+                width: 28, height: 28, borderRadius: "50%",
+                border: `2.5px solid ${P.border}`,
+                borderTopColor: P.navy,
+                animation: "spin 0.7s linear infinite"
               }} />
             </div>
           ) : cards.length === 0 ? (
-            <div style={{ 
-              background: P.bgCard, 
-              border: `2px dashed ${P.border}`, 
-              borderRadius: T.r.xl, 
-              padding: "60px 20px", 
-              textAlign: "center" 
+            <div style={{
+              background: P.bgCard,
+              border: `2px dashed ${P.border}`,
+              borderRadius: T.r.xl,
+              padding: "60px 20px",
+              textAlign: "center"
             }}>
-              <div style={{ 
-                width: 64, height: 64, borderRadius: T.r.lg, 
-                background: P.accentLt, 
-                display: "flex", alignItems: "center", justifyContent: "center", 
-                margin: "0 auto 16px" 
+              <div style={{
+                width: 64, height: 64, borderRadius: T.r.lg,
+                background: P.accentLt,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 16px"
               }}>
                 <Icon name="card" size={28} color={P.blue} />
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: P.text, marginBottom: 6 }}>
-                No cards yet
+                Aucune carte pour le moment
               </h3>
               <p style={{ color: P.textMuted, fontSize: 14, marginBottom: 20 }}>
-                Create your first digital business card to start sharing.
+                Créez votre première carte de visite numérique pour commencer à la partager.
               </p>
-              <button 
-                onClick={() => { setEditingCard(null); setIsFormOpen(true); }} 
+              <button
+                onClick={() => { setEditingCard(null); setIsFormOpen(true); }}
                 className="hoverable"
                 style={btn("primary", "md")}
               >
                 <Icon name="plus" size={16} color="#fff" />
-                Create your first card
+                Créer votre première carte
               </button>
             </div>
           ) : (
-            <div style={{ 
-              display: "grid", 
-              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", 
-              gap: 20 
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+              gap: 20
             }}>
               {cards.map(card => (
-                <CardTile 
-                  key={card.id} 
+                <CardTile
+                  key={card.id}
                   card={card}
                   onEdit={(c) => { setEditingCard(c); setIsFormOpen(true); }}
                   onDelete={(c) => setDeletingCard(c)}
@@ -324,6 +323,8 @@ export default function App() {
           )}
         </main>
       )}
+
+      </div>
 
       {/* ─── MODALS ─── */}
       {isFormOpen && (
